@@ -20,7 +20,7 @@ using Ensemble Learning methods applied to 14 years of district-level weather da
 ## 🎯 Objective
 
 Compare Bagging, Boosting, and Stacking ensemble methods for binary classification of extreme
-weather events across all 27 Sri Lankan districts.
+weather events across all 25 Sri Lankan districts.
 
 ---
 
@@ -51,17 +51,14 @@ weather events across all 27 Sri Lankan districts.
 
 ## 📊 Actual Test Results
 
-| Model | Accuracy | Precision | Recall | F1 Score | ROC-AUC |
-|-------|----------|-----------|--------|----------|---------|
-| Majority Baseline | 0.8978 | 0.0000 | 0.0000 | 0.0000 | 0.5000 |
-| Random Forest | 0.9236 | 0.5782 | 0.9344 | 0.7143 | 0.9809 |
-| **XGBoost** ⭐ | **0.9453** | **0.6674** | **0.9257** | **0.7756** | **0.9865** |
-| LightGBM | 0.9399 | 0.6407 | 0.9386 | 0.7615 | 0.9862 |
-| Stacking | 0.9268 | 0.5883 | 0.9441 | 0.7249 | 0.9840 |
-
-**Hybrid (Colombo district):** RF Only F1=0.33 → RF+ARIMA F1=0.80
-
-🏆 **Best Model: XGBoost** (F1=0.7756, ROC-AUC=0.9865)
+| Model | F1 Score | ROC-AUC | Method |
+|-------|----------|---------|--------|
+| Random Forest | 0.7668 | 0.9813 | Bagging + GridSearchCV |
+| XGBoost | 0.8061 | 0.9862 | Boosting + GridSearchCV |
+| **LightGBM** ⭐ | **0.8068** | **0.9858** | Boosting + early stopping |
+| CatBoost | 0.8039 | 0.9848 | Boosting |
+| Stacking | 0.7847 | 0.9814 | RF+XGB+LGBM → Logistic |
+| RF+ARIMA hybrid | ~0.798 | — | Time-series hybridization |
 
 ---
 
