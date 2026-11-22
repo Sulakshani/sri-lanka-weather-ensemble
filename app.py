@@ -520,7 +520,7 @@ Accuracy: {v['Accuracy']}
             st.plotly_chart(fig, use_container_width=True)
             st.success(f"RF+ARIMA improves F1 from {hybrid['RF Only']['F1']} → {hybrid['RF+ARIMA']['F1']} (+{hybrid['RF+ARIMA']['F1']-hybrid['RF Only']['F1']:.4f})")
 
-        # ── Conclusion ─────────────────────────────────────────────────────────
+    # ── Conclusion ─────────────────────────────────────────────────────────
     st.markdown("---")
     best_row = model_rows.sort_values("F1 Score", ascending=False).iloc[0]
 
@@ -551,7 +551,7 @@ Features use previous-day observations to prevent data leakage.
 elif page == "🔮 Prediction":
     st.markdown('<div class="main-header">🔮 Extreme Weather Prediction</div>',
                 unsafe_allow_html=True)
-    st.markdown('<div class="sub-header">Enter yesterday\'s weather conditions to predict extreme weather risk.</div>',
+    st.markdown('<div class="sub-header">Single-day or monthly extreme weather risk forecasting.</div>',
                 unsafe_allow_html=True)
     st.info("ℹ️ Uses previous-day observations only (no same-day data leakage). "
             "All predictions come from trained models — no hardcoded values.")
@@ -561,101 +561,319 @@ elif page == "🔮 Prediction":
     le = LabelEncoder()
     le.fit(sorted(df["city_name"].unique()))
 
-    with st.form("pred_form"):
-        st.markdown("### Weather Conditions (Yesterday's Readings)")
-        c1,c2,c3 = st.columns(3)
-        with c1:
-            tmin     = st.number_input("Min Temp (°C)",         10.0, 35.0, 24.0, 0.5)
-            tmean    = st.number_input("Mean Temp (°C)",         15.0, 38.0, 28.0, 0.5)
-            app_max  = st.number_input("Apparent Temp Max (°C)", 20.0, 45.0, 32.0, 0.5)
-            app_min  = st.number_input("Apparent Temp Min (°C)", 15.0, 38.0, 26.0, 0.5)
-        with c2:
-            prec_h   = st.number_input("Precipitation Hours (h)", 0, 24, 2)
-            wind     = st.number_input("Wind Speed Max (km/h)",   0.0,120.0, 25.0, 1.0)
-            gusts    = st.number_input("Wind Gusts Max (km/h)",   0.0,150.0, 40.0, 1.0)
-            wind_dir = st.number_input("Wind Direction (°)",      0, 360, 180)
-        with c3:
-            rain_l1  = st.number_input("Yesterday Rainfall (mm)", 0.0,200.0,  2.0, 0.5)
-            rain_l3  = st.number_input("3-Day Avg Rain (mm)",     0.0,100.0,  1.5, 0.5)
-            rain_r7  = st.number_input("7-Day Rolling Rain (mm)", 0.0, 80.0,  1.2, 0.5)
-            tmax_l1  = st.number_input("Yesterday Max Temp (°C)", 20.0,40.0, 29.0, 0.5)
+    # ── Two tabs ───────────────────────────────────────────────────────────
+    tab1, tab2 = st.tabs(["🔮 Single Day Prediction", "📅 Monthly Forecast"])
 
-        c4,c5 = st.columns(2)
-        with c4:
-            month    = st.selectbox("Month", list(range(1,13)), index=5)
-            district = st.selectbox("District", DISTRICTS)
-        with c5:
-            radiation= st.number_input("Shortwave Radiation (MJ/m²)", 0.0, 35.0, 18.0, 0.5)
-            sunshine = st.number_input("Sunshine Duration (s)",        0.0,50000.0,25000.0,500.0)
-            daylight = st.number_input("Daylight Duration (s)",      40000.0,50000.0,44000.0,100.0)
-            wcode    = st.number_input("WMO Weather Code",            0, 99, 2)
+    # ══════════════════════════════════════════════════════════════════════
+    # TAB 1 — SINGLE DAY
+    # ══════════════════════════════════════════════════════════════════════
+    with tab1:
+        with st.form("pred_form"):
+            st.markdown("### Weather Conditions (Yesterday's Readings)")
+            c1,c2,c3 = st.columns(3)
+            with c1:
+                tmin     = st.number_input("Min Temp (°C)",         10.0, 35.0, 24.0, 0.5)
+                tmean    = st.number_input("Mean Temp (°C)",         15.0, 38.0, 28.0, 0.5)
+                app_max  = st.number_input("Apparent Temp Max (°C)", 20.0, 45.0, 32.0, 0.5)
+                app_min  = st.number_input("Apparent Temp Min (°C)", 15.0, 38.0, 26.0, 0.5)
+            with c2:
+                prec_h   = st.number_input("Precipitation Hours (h)", 0, 24, 2)
+                wind     = st.number_input("Wind Speed Max (km/h)",   0.0,120.0, 25.0, 1.0)
+                gusts    = st.number_input("Wind Gusts Max (km/h)",   0.0,150.0, 40.0, 1.0)
+                wind_dir = st.number_input("Wind Direction (°)",      0, 360, 180)
+            with c3:
+                rain_l1  = st.number_input("Yesterday Rainfall (mm)", 0.0,200.0,  2.0, 0.5)
+                rain_l3  = st.number_input("3-Day Avg Rain (mm)",     0.0,100.0,  1.5, 0.5)
+                rain_r7  = st.number_input("7-Day Rolling Rain (mm)", 0.0, 80.0,  1.2, 0.5)
+                tmax_l1  = st.number_input("Yesterday Max Temp (°C)", 20.0,40.0, 29.0, 0.5)
 
-        sel_model = st.selectbox("Model", list(models.keys()))
-        submitted = st.form_submit_button("🔮 Predict", use_container_width=True)
+            c4,c5 = st.columns(2)
+            with c4:
+                month    = st.selectbox("Month", list(range(1,13)), index=5)
+                district = st.selectbox("District", DISTRICTS)
+            with c5:
+                radiation= st.number_input("Shortwave Radiation (MJ/m²)", 0.0, 35.0, 18.0, 0.5)
+                sunshine = st.number_input("Sunshine Duration (s)",        0.0,50000.0,25000.0,500.0)
+                daylight = st.number_input("Daylight Duration (s)",      40000.0,50000.0,44000.0,100.0)
+                wcode    = st.number_input("WMO Weather Code",            0, 99, 2)
 
-    if submitted and models:
-        dist_enc = int(le.transform([district])[0])
-        loc_row  = df[df["city_name"]==district][["latitude","longitude"]].iloc[0]
+            sel_model = st.selectbox("Model", list(models.keys()))
+            submitted = st.form_submit_button("🔮 Predict", use_container_width=True)
 
-        inp = {
-            "temperature_2m_min (°C)":        tmin,
-            "temperature_2m_mean (°C)":        tmean,
-            "apparent_temperature_max (°C)":   app_max,
-            "apparent_temperature_min (°C)":   app_min,
-            "apparent_temperature_mean (°C)":  (app_max+app_min)/2,
-            "precipitation_hours (h)":         prec_h,
-            "wind_speed_10m_max (km/h)":       wind,
-            "wind_gusts_10m_max (km/h)":       gusts,
-            "wind_direction_10m_dominant (°)": wind_dir,
-            "shortwave_radiation_sum (MJ/m²)": radiation,
-            "et0_fao_evapotranspiration (mm)": 3.5,
-            "sunshine_duration (s)":           sunshine,
-            "daylight_duration (s)":           daylight,
-            "weather_code (wmo code)":         wcode,
-            "month":                           month,
-            "day_of_year":                     30*(month-1)+15,
-            "year":                            2023,
-            "rain_lag1":  rain_l1, "rain_lag3":  rain_l3,
-            "rain_roll7": rain_r7, "rain_roll30": rain_r7*0.9,
-            "tmax_lag1":  tmax_l1, "tmax_lag3":  tmax_l1*0.98,
-            "tmax_roll7": tmax_l1*0.97, "tmax_roll30": tmax_l1*0.96,
-            "wind_lag1":  wind*0.9,  "wind_lag3":  wind*0.85,
-            "wind_roll7": wind*0.8,  "wind_roll30":wind*0.75,
-            "daylight_min": daylight/60,
-            "district_enc": dist_enc,
-            "latitude":  float(loc_row["latitude"]),
-            "longitude": float(loc_row["longitude"]),
-        }
-        X_in = pd.DataFrame([{c: inp.get(c,0) for c in feat_cols}])
-        m    = models[sel_model]
-        pred = int(m.predict(X_in)[0])
-        prob = float(m.predict_proba(X_in)[0][1])
+        if submitted and models:
+            dist_enc = int(le.transform([district])[0])
+            loc_row  = df[df["city_name"]==district][["latitude","longitude"]].iloc[0]
 
-        st.markdown("---")
-        if pred == 1:
-            st.error(f"⚠️ **Extreme Weather Day Predicted** — {prob*100:.1f}% probability")
-        else:
-            st.success(f"✅ **Normal Day Predicted** — {prob*100:.1f}% extreme probability")
+            inp = {
+                "temperature_2m_min (°C)":        tmin,
+                "temperature_2m_mean (°C)":        tmean,
+                "apparent_temperature_max (°C)":   app_max,
+                "apparent_temperature_min (°C)":   app_min,
+                "apparent_temperature_mean (°C)":  (app_max+app_min)/2,
+                "precipitation_hours (h)":         prec_h,
+                "wind_speed_10m_max (km/h)":       wind,
+                "wind_gusts_10m_max (km/h)":       gusts,
+                "wind_direction_10m_dominant (°)": wind_dir,
+                "shortwave_radiation_sum (MJ/m²)": radiation,
+                "et0_fao_evapotranspiration (mm)": 3.5,
+                "sunshine_duration (s)":           sunshine,
+                "daylight_duration (s)":           daylight,
+                "weather_code (wmo code)":         wcode,
+                "month":                           month,
+                "day_of_year":                     30*(month-1)+15,
+                "year":                            2023,
+                "rain_lag1":  rain_l1, "rain_lag3":  rain_l3,
+                "rain_roll7": rain_r7, "rain_roll30": rain_r7*0.9,
+                "tmax_lag1":  tmax_l1, "tmax_lag3":  tmax_l1*0.98,
+                "tmax_roll7": tmax_l1*0.97, "tmax_roll30": tmax_l1*0.96,
+                "wind_lag1":  wind*0.9,  "wind_lag3":  wind*0.85,
+                "wind_roll7": wind*0.8,  "wind_roll30":wind*0.75,
+                "daylight_min": daylight/60,
+                "district_enc": dist_enc,
+                "latitude":  float(loc_row["latitude"]),
+                "longitude": float(loc_row["longitude"]),
+            }
+            X_in = pd.DataFrame([{c: inp.get(c,0) for c in feat_cols}])
+            m    = models[sel_model]
+            pred = int(m.predict(X_in)[0])
+            prob = float(m.predict_proba(X_in)[0][1])
 
-        fig = go.Figure(go.Indicator(
-            mode="gauge+number", value=prob*100,
-            title={"text":"Extreme Weather Risk (%)"},
-            gauge={"axis":{"range":[0,100]},
-                   "bar":{"color":"#e74c3c" if pred==1 else "#27ae60"},
-                   "steps":[{"range":[0,30],"color":"#eafaf1"},
-                             {"range":[30,60],"color":"#fef9e7"},
-                             {"range":[60,100],"color":"#fce4e4"}],
-                   "threshold":{"line":{"color":"black","width":3},
-                                "thickness":0.75,"value":50}}))
-        fig.update_layout(height=280)
-        st.plotly_chart(fig, use_container_width=True)
+            st.markdown("---")
+            if pred == 1:
+                st.error(f"⚠️ **Extreme Weather Day Predicted** — {prob*100:.1f}% probability")
+            else:
+                st.success(f"✅ **Normal Day Predicted** — {prob*100:.1f}% extreme probability")
 
-        st.markdown("### All Models Comparison")
-        rows = []
-        for nm, mo in models.items():
-            p  = int(mo.predict(X_in)[0])
-            pr = float(mo.predict_proba(X_in)[0][1])
-            rows.append({"Model":nm,
-                         "Prediction":"⚠️ Extreme" if p==1 else "✅ Normal",
-                         "Probability":f"{pr*100:.1f}%"})
-        st.dataframe(pd.DataFrame(rows).set_index("Model"), use_container_width=True)
+            fig = go.Figure(go.Indicator(
+                mode="gauge+number", value=prob*100,
+                title={"text":"Extreme Weather Risk (%)"},
+                gauge={"axis":{"range":[0,100]},
+                       "bar":{"color":"#e74c3c" if pred==1 else "#27ae60"},
+                       "steps":[{"range":[0,30],"color":"#eafaf1"},
+                                 {"range":[30,60],"color":"#fef9e7"},
+                                 {"range":[60,100],"color":"#fce4e4"}],
+                       "threshold":{"line":{"color":"black","width":3},
+                                    "thickness":0.75,"value":50}}))
+            fig.update_layout(height=280)
+            st.plotly_chart(fig, use_container_width=True)
+
+            st.markdown("### All Models Comparison")
+            rows = []
+            for nm, mo in models.items():
+                p  = int(mo.predict(X_in)[0])
+                pr = float(mo.predict_proba(X_in)[0][1])
+                rows.append({"Model":nm,
+                             "Prediction":"⚠️ Extreme" if p==1 else "✅ Normal",
+                             "Probability":f"{pr*100:.1f}%"})
+            st.dataframe(pd.DataFrame(rows).set_index("Model"), use_container_width=True)
+
+    # ══════════════════════════════════════════════════════════════════════
+    # TAB 2 — MONTHLY FORECAST
+    # ══════════════════════════════════════════════════════════════════════
+    with tab2:
+        st.markdown("### 📅 Monthly Extreme Weather Forecast")
+        st.markdown(
+            "Generates a prediction for every day of the selected month using "
+            "that month's typical Sri Lanka climate patterns."
+        )
+
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            fc_district = st.selectbox("District", DISTRICTS, key="fc_district")
+        with col2:
+            MONTH_NAMES = ["Jan","Feb","Mar","Apr","May","Jun",
+                           "Jul","Aug","Sep","Oct","Nov","Dec"]
+            fc_month = st.selectbox(
+                "Month", list(range(1, 13)),
+                format_func=lambda m: MONTH_NAMES[m - 1],
+                index=4, key="fc_month",
+            )
+        with col3:
+            fc_model = st.selectbox("Model", list(models.keys()), key="fc_model")
+
+        if st.button("🗓️ Generate Monthly Forecast", use_container_width=True):
+            import calendar
+
+            # Sri Lanka monthly climate averages
+            MONTHLY_CLIMATE = {
+                1:  {"rain":  67, "tmax": 30.0, "wind": 20},
+                2:  {"rain":  69, "tmax": 31.0, "wind": 18},
+                3:  {"rain":  99, "tmax": 32.0, "wind": 17},
+                4:  {"rain": 220, "tmax": 32.0, "wind": 16},
+                5:  {"rain": 371, "tmax": 31.0, "wind": 20},
+                6:  {"rain": 179, "tmax": 30.0, "wind": 25},
+                7:  {"rain": 136, "tmax": 29.5, "wind": 27},
+                8:  {"rain": 109, "tmax": 29.5, "wind": 24},
+                9:  {"rain": 160, "tmax": 29.5, "wind": 20},
+                10: {"rain": 341, "tmax": 29.0, "wind": 18},
+                11: {"rain": 315, "tmax": 28.5, "wind": 17},
+                12: {"rain": 147, "tmax": 29.0, "wind": 18},
+            }
+
+            clim         = MONTHLY_CLIMATE[fc_month]
+            dist_enc     = int(le.transform([fc_district])[0])
+            loc_row      = df[df["city_name"] == fc_district][["latitude","longitude"]].iloc[0]
+            num_days     = calendar.monthrange(2024, fc_month)[1]
+            fc_model_obj = models[fc_model]
+
+            daily_results = []
+            for day in range(1, num_days + 1):
+                day_factor  = 1 + 0.3 * np.sin(2 * np.pi * day / num_days)
+                rain_today  = clim["rain"] / num_days * day_factor
+                wind_today  = clim["wind"] * (1 + 0.1 * np.sin(day))
+                tmax_today  = clim["tmax"] + 1.5 * np.sin(2 * np.pi * day / num_days)
+                tmean_today = tmax_today - 4.0
+                tmin_today  = tmax_today - 7.0
+
+                inp = {
+                    "temperature_2m_min (°C)":        tmin_today,
+                    "temperature_2m_mean (°C)":        tmean_today,
+                    "apparent_temperature_max (°C)":   tmax_today + 1.5,
+                    "apparent_temperature_min (°C)":   tmin_today + 1.0,
+                    "apparent_temperature_mean (°C)":  tmean_today + 1.0,
+                    "precipitation_hours (h)":         min(24, rain_today / 3),
+                    "wind_speed_10m_max (km/h)":       wind_today,
+                    "wind_gusts_10m_max (km/h)":       wind_today * 1.5,
+                    "wind_direction_10m_dominant (°)": 180,
+                    "shortwave_radiation_sum (MJ/m²)": 18.0,
+                    "et0_fao_evapotranspiration (mm)": 3.5,
+                    "sunshine_duration (s)":           25000,
+                    "daylight_duration (s)":           44000,
+                    "weather_code (wmo code)":         61 if rain_today > 10 else 2,
+                    "month":                           fc_month,
+                    "day_of_year":                     30 * (fc_month - 1) + day,
+                    "year":                            2024,
+                    "rain_lag1":   rain_today * 0.9,
+                    "rain_lag3":   rain_today * 0.85,
+                    "rain_roll7":  rain_today * 0.8,
+                    "rain_roll30": rain_today * 0.75,
+                    "tmax_lag1":   tmax_today * 0.99,
+                    "tmax_lag3":   tmax_today * 0.98,
+                    "tmax_roll7":  tmax_today * 0.97,
+                    "tmax_roll30": tmax_today * 0.96,
+                    "wind_lag1":   wind_today * 0.9,
+                    "wind_lag3":   wind_today * 0.85,
+                    "wind_roll7":  wind_today * 0.8,
+                    "wind_roll30": wind_today * 0.75,
+                    "daylight_min": 44000 / 60,
+                    "district_enc": dist_enc,
+                    "latitude":    float(loc_row["latitude"]),
+                    "longitude":   float(loc_row["longitude"]),
+                }
+                X_day = pd.DataFrame([{c: inp.get(c, 0) for c in feat_cols}])
+                prob  = float(fc_model_obj.predict_proba(X_day)[0][1])
+                pred  = int(fc_model_obj.predict(X_day)[0])
+                daily_results.append({"Day": day, "Risk (%)": round(prob * 100, 1), "Prediction": pred})
+
+            result_df    = pd.DataFrame(daily_results)
+            extreme_days = result_df[result_df["Prediction"] == 1]["Day"].tolist()
+            avg_risk     = result_df["Risk (%)"].mean()
+            max_risk_row = result_df.loc[result_df["Risk (%)"].idxmax()]
+            month_name   = MONTH_NAMES[fc_month - 1]
+
+            # ── Summary metrics ──────────────────────────────────────────
+            st.markdown("---")
+            m1, m2, m3 = st.columns(3)
+            m1.metric("⚠️ Extreme Days Predicted", f"{len(extreme_days)} / {num_days}")
+            m2.metric("📊 Average Risk",            f"{avg_risk:.1f}%")
+            m3.metric("🔺 Highest Risk Day",        f"Day {int(max_risk_row['Day'])} ({max_risk_row['Risk (%)']:.1f}%)")
+
+            # ── Risk timeline chart ──────────────────────────────────────
+            fig_line = go.Figure()
+            fig_line.add_trace(go.Scatter(
+                x=result_df["Day"],
+                y=result_df["Risk (%)"],
+                mode="lines+markers",
+                line=dict(color="#e74c3c", width=2),
+                marker=dict(
+                    color=["#e74c3c" if p == 1 else "#27ae60"
+                           for p in result_df["Prediction"]],
+                    size=8,
+                ),
+                name="Daily Risk",
+            ))
+            fig_line.add_hline(y=50, line_dash="dash", line_color="orange",
+                               annotation_text="Risk threshold (50%)")
+            fig_line.update_layout(
+                title=f"Daily Extreme Weather Risk — {month_name}, {fc_district}",
+                xaxis_title="Day of Month",
+                yaxis_title="Extreme Weather Risk (%)",
+                yaxis=dict(range=[0, 100]),
+                height=360,
+            )
+            st.plotly_chart(fig_line, use_container_width=True)
+
+            # ── Calendar heatmap ─────────────────────────────────────────
+            st.markdown("#### 🗓️ Calendar View")
+            risk_map = dict(zip(result_df["Day"], result_df["Risk (%)"]))
+            pred_map = dict(zip(result_df["Day"], result_df["Prediction"]))
+
+            first_dow = calendar.monthrange(2024, fc_month)[0]  # 0 = Monday
+            weeks, week_row, dow = [], [], 0
+            for _ in range(first_dow):
+                week_row.append(None)
+                dow += 1
+            for day in range(1, num_days + 1):
+                week_row.append(day)
+                dow += 1
+                if dow == 7:
+                    weeks.append(week_row)
+                    week_row, dow = [], 0
+            if week_row:
+                while len(week_row) < 7:
+                    week_row.append(None)
+                weeks.append(week_row)
+
+            cal_html = """
+            <style>
+            .cal-wrap{font-family:Arial,sans-serif;max-width:580px;margin:0 auto}
+            .cal-wrap table{width:100%;border-collapse:collapse}
+            .cal-wrap th{background:#1F4E79;color:#fff;padding:9px;text-align:center;font-size:13px}
+            .cal-wrap td{width:14%;padding:8px 4px;text-align:center;vertical-align:top;
+                         border:1px solid #2e4a62;font-size:12px;border-radius:4px}
+            .cal-wrap td.empty{background:#0f1b2d}
+            .extreme{background:#4a1010;color:#ff6b6b;font-weight:bold}
+            .normal{background:#0d2e1e;color:#2ecc71}
+            .risk-pct{font-size:10px;color:#8899aa;display:block;margin-top:2px}
+            </style>
+            <div class="cal-wrap"><table>
+            <tr><th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th><th>Sun</th></tr>
+            """
+            for week in weeks:
+                cal_html += "<tr>"
+                for d in week:
+                    if d is None:
+                        cal_html += '<td class="empty"></td>'
+                    else:
+                        risk = risk_map.get(d, 0)
+                        cls  = "extreme" if pred_map.get(d, 0) == 1 else "normal"
+                        cal_html += (
+                            f'<td class="{cls}"><b>{d}</b>'
+                            f'<span class="risk-pct">{risk:.0f}%</span></td>'
+                        )
+                cal_html += "</tr>"
+            cal_html += "</table></div>"
+            st.markdown(cal_html, unsafe_allow_html=True)
+
+            # ── Extreme days alert ───────────────────────────────────────
+            st.markdown("---")
+            if extreme_days:
+                st.error(
+                    f"⚠️ **{len(extreme_days)} extreme weather day(s) predicted** "
+                    f"in {month_name} for {fc_district}: "
+                    f"Days {', '.join(map(str, extreme_days))}"
+                )
+            else:
+                st.success(
+                    f"✅ **No extreme weather days predicted** "
+                    f"in {month_name} for {fc_district}"
+                )
+
+            # ── Download CSV ─────────────────────────────────────────────
+            csv = result_df.to_csv(index=False)
+            st.download_button(
+                label="⬇️ Download Monthly Forecast CSV",
+                data=csv,
+                file_name=f"forecast_{fc_district}_{month_name}.csv",
+                mime="text/csv",
+            )
