@@ -1,0 +1,110 @@
+[
+  {
+    "Model": "Majority Baseline",
+    "Accuracy": 0.8978,
+    "Precision": 0.0,
+    "Recall": 0.0,
+    "F1 Score": 0.0,
+    "ROC-AUC": 0.5,
+    "CM": [
+      [
+        19163,
+        0
+      ],
+      [
+        2181,
+        0
+      ]
+    ]
+  },
+  {
+    "Model": "Random Forest",
+    "Accuracy": 0.9456,
+    "Precision": 0.6823,
+    "Recall": 0.8753,
+    "F1 Score": 0.7668,
+    "ROC-AUC": 0.9813,
+    "CM": [
+      [
+        18274,
+        889
+      ],
+      [
+        272,
+        1909
+      ]
+    ]
+  },
+  {
+    "Model": "XGBoost",
+    "Accuracy": 0.9611,
+    "Precision": 0.8218,
+    "Recall": 0.7909,
+    "F1 Score": 0.8061,
+    "ROC-AUC": 0.9862,
+    "CM": [
+      [
+        18789,
+        374
+      ],
+      [
+        456,
+        1725
+      ]
+    ]
+  },
+  {
+    "Model": "LightGBM",
+    "Accuracy": 0.9611,
+    "Precision": 0.8194,
+    "Recall": 0.7946,
+    "F1 Score": 0.8068,
+    "ROC-AUC": 0.9858,
+    "CM": [
+      [
+        18781,
+        382
+      ],
+      [
+        448,
+        1733
+      ]
+    ]
+  },
+  {
+    "Model": "CatBoost",
+    "Accuracy": 0.9601,
+    "Precision": 0.8072,
+    "Recall": 0.8006,
+    "F1 Score": 0.8039,
+    "ROC-AUC": 0.9848,
+    "CM": [
+      [
+        18746,
+        417
+      ],
+      [
+        435,
+        1746
+      ]
+    ]
+  },
+  {
+    "Model": "Stacking",
+    "Accuracy": 0.9539,
+    "Precision": 0.7498,
+    "Recall": 0.823,
+    "F1 Score": 0.7847,
+    "ROC-AUC": 0.9814,
+    "CM": [
+      [
+        18564,
+        599
+      ],
+      [
+        386,
+        1795
+      ]
+    ]
+  }
+]

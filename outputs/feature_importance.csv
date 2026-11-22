@@ -1,0 +1,81 @@
+feature,importance,model
+weather_code (wmo code),0.1942327063709,Random Forest
+tmax_lag1,0.10637547249147089,Random Forest
+precipitation_hours (h),0.08224339493642277,Random Forest
+tmax_roll7,0.06740895334552381,Random Forest
+sunshine_duration (s),0.06451733438398764,Random Forest
+et0_fao_evapotranspiration (mm),0.0573385940135898,Random Forest
+tmax_lag3,0.05361422099855124,Random Forest
+apparent_temperature_max (°C),0.046707993574244364,Random Forest
+temperature_2m_mean (°C),0.04622905651319179,Random Forest
+tmax_roll30,0.041120463189683674,Random Forest
+shortwave_radiation_sum (MJ/m²),0.033168785745101896,Random Forest
+rain_lag1,0.02955619316248392,Random Forest
+rain_roll7,0.0195791091790126,Random Forest
+apparent_temperature_mean (°C),0.016478821074409265,Random Forest
+longitude,0.013471371400238604,Random Forest
+rain_lag3,0.010940702784578378,Random Forest
+latitude,0.009935875469938522,Random Forest
+rain_roll30,0.009571462622530625,Random Forest
+district_enc,0.009104648891129344,Random Forest
+day_of_year,0.008804507889165447,Random Forest
+weather_code (wmo code),0.28587114810943604,XGBoost
+tmax_lag1,0.2430761158466339,XGBoost
+tmax_roll7,0.09386586397886276,XGBoost
+precipitation_hours (h),0.06784535944461823,XGBoost
+sunshine_duration (s),0.0397675596177578,XGBoost
+apparent_temperature_max (°C),0.024433836340904236,XGBoost
+latitude,0.022393306717276573,XGBoost
+longitude,0.022004384547472,XGBoost
+district_enc,0.021583953872323036,XGBoost
+year,0.01925019919872284,XGBoost
+et0_fao_evapotranspiration (mm),0.016977563500404358,XGBoost
+month,0.014856883324682713,XGBoost
+temperature_2m_mean (°C),0.013128084130585194,XGBoost
+rain_lag1,0.01269721519201994,XGBoost
+tmax_lag3,0.011614861898124218,XGBoost
+temperature_2m_min (°C),0.009446676820516586,XGBoost
+tmax_roll30,0.008842970244586468,XGBoost
+shortwave_radiation_sum (MJ/m²),0.008594025857746601,XGBoost
+apparent_temperature_min (°C),0.008546036668121815,XGBoost
+rain_lag3,0.007539777550846338,XGBoost
+precipitation_hours (h),588.0,LightGBM
+weather_code (wmo code),571.0,LightGBM
+apparent_temperature_max (°C),556.0,LightGBM
+year,504.0,LightGBM
+latitude,502.0,LightGBM
+longitude,496.0,LightGBM
+temperature_2m_mean (°C),493.0,LightGBM
+et0_fao_evapotranspiration (mm),473.0,LightGBM
+tmax_lag1,335.0,LightGBM
+temperature_2m_min (°C),315.0,LightGBM
+sunshine_duration (s),312.0,LightGBM
+district_enc,291.0,LightGBM
+wind_gusts_10m_max (km/h),267.0,LightGBM
+shortwave_radiation_sum (MJ/m²),249.0,LightGBM
+rain_lag1,238.0,LightGBM
+wind_direction_10m_dominant (°),226.0,LightGBM
+apparent_temperature_min (°C),217.0,LightGBM
+wind_speed_10m_max (km/h),213.0,LightGBM
+day_of_year,182.0,LightGBM
+rain_roll7,175.0,LightGBM
+weather_code (wmo code),18.753971509678564,CatBoost
+longitude,15.604191817297789,CatBoost
+year,13.926700468013316,CatBoost
+latitude,12.083374153306925,CatBoost
+district_enc,10.054330780208208,CatBoost
+precipitation_hours (h),6.431357610196579,CatBoost
+tmax_lag1,4.383090029384181,CatBoost
+apparent_temperature_max (°C),3.464048111713566,CatBoost
+et0_fao_evapotranspiration (mm),2.15976336218675,CatBoost
+temperature_2m_mean (°C),2.0652366563636897,CatBoost
+month,2.041846339906047,CatBoost
+sunshine_duration (s),1.2513936370508922,CatBoost
+temperature_2m_min (°C),1.2441773399517653,CatBoost
+tmax_roll7,1.2344977874049916,CatBoost
+rain_lag1,1.1027756520384753,CatBoost
+rain_lag3,0.9237507391717762,CatBoost
+apparent_temperature_min (°C),0.7701671208596153,CatBoost
+shortwave_radiation_sum (MJ/m²),0.6163778359272518,CatBoost
+tmax_roll30,0.32801662865815,CatBoost
+apparent_temperature_mean (°C),0.2932011859417865,CatBoost

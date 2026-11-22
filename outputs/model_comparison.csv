@@ -1,0 +1,7 @@
+Model,Accuracy,Precision,Recall,F1 Score,ROC-AUC
+Majority Baseline,0.8978,0.0,0.0,0.0,0.5
+Random Forest,0.9456,0.6823,0.8753,0.7668,0.9813
+XGBoost,0.9611,0.8218,0.7909,0.8061,0.9862
+LightGBM,0.9611,0.8194,0.7946,0.8068,0.9858
+CatBoost,0.9601,0.8072,0.8006,0.8039,0.9848
+Stacking,0.9539,0.7498,0.823,0.7847,0.9814
