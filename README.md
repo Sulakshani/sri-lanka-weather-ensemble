@@ -1,6 +1,6 @@
 # 🌦️ Predicting Extreme Weather Days in Sri Lanka Using Ensemble Learning
 
-🌐 **Live Dashboard:** https://sri-lanka-weather-ensemble-cr48wow9csnoiidh7gaqjo.streamlit.app/
+🌐 **Live Dashboard:** https://sri-lanka-weather-ensemble-w3dafyoiip3fv9agvdt88c.streamlit.app/
 
 📁 **GitHub:** https://github.com/Sulakshani/sri-lanka-weather-ensemble
 
