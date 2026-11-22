@@ -520,15 +520,24 @@ Accuracy: {v['Accuracy']}
             st.plotly_chart(fig, use_container_width=True)
             st.success(f"RF+ARIMA improves F1 from {hybrid['RF Only']['F1']} → {hybrid['RF+ARIMA']['F1']} (+{hybrid['RF+ARIMA']['F1']-hybrid['RF Only']['F1']:.4f})")
 
-    # ── Conclusion ─────────────────────────────────────────────────────────
+        # ── Conclusion ─────────────────────────────────────────────────────────
     st.markdown("---")
     best_row = model_rows.sort_values("F1 Score", ascending=False).iloc[0]
+
+    model_reasons = {
+        "LightGBM":     "it uses histogram-based splitting and leaf-wise tree growth, which finds finer decision boundaries efficiently on tabular weather data.",
+        "CatBoost":     "it handles class-boundary complexity well through symmetric tree growth and built-in regularisation.",
+        "XGBoost":      "it uses aggressive regularisation (L1/L2) and column subsampling, which controls overfitting on the SMOTE-balanced data.",
+        "Random Forest":"its ensemble of deep trees captures non-linear interactions in the weather features robustly.",
+        "Stacking":     "it combines multiple strong base models, allowing the meta-learner to exploit their complementary strengths.",
+    }
+    reason = model_reasons.get(best_row["Model"], "it achieved the best balance of precision and recall on this dataset.")
+
     st.markdown(f"""<div class="ebox">
 <b>🏁 Conclusion — Why {best_row['Model']} performs best</b><br><br>
 After SMOTE balancing and GridSearchCV tuning, all boosting models (XGBoost, LightGBM, CatBoost)
-outperform Random Forest and Stacking on this dataset. CatBoost edges out with F1={best_row['F1 Score']}
-because it handles the remaining class-boundary complexity well through symmetric tree growth
-and built-in regularisation.<br><br>
+outperform Random Forest and Stacking on this dataset. <b>{best_row['Model']}</b> edges out
+with F1={best_row['F1 Score']:.4f} because {reason}<br><br>
 <b>Stacking</b> combines three strong base models but doesn't outperform the best individual
 boosting model — the meta-learner gains diminishing returns when base models are already
 well-calibrated after SMOTE.<br><br>
