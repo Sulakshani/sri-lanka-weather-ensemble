@@ -131,6 +131,8 @@ streamlit run app.py
 
 ### 6. Open Notebook
 ```powershell
+venv\Scripts\activate
+pip install jupyter
 jupyter notebook notebooks/ensemble_learning_assignment.ipynb
 ```
 
