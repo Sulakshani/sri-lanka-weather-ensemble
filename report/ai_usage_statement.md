@@ -1,9 +1,7 @@
 # AI Usage Statement
 
-# 🤖 AI Usage Report
 
 **Project:** Predicting Extreme Weather Days in Sri Lanka Using Ensemble Learning  
-**University of Moratuwa — Ensemble Learning Assignment**
 
 ---
 
@@ -44,8 +42,6 @@ AI was used as a **coding tool**, similar to how a developer uses Stack Overflow
 | What AI Wrote | What I Decided |
 |---|---|
 | Streamlit dashboard layout (`app.py`) | What metrics to show and how to interpret them |
-| Preprocessing pipeline structure (`src/preprocess.py`) | Which features to include and why |
-| Model training script scaffolding (`src/train.py`, `src/evaluate.py`) | Which models to compare and what hyperparameters to try |
 | RF+ARIMA hybrid code structure (`src/features.py`) | That this hybrid approach was needed (lecturer recommendation) |
 | README structure and notebook cell layout | All analysis, conclusions, and explanations in the notebook |
 
