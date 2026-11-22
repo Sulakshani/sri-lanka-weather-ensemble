@@ -2,8 +2,7 @@
 ## Predicting Extreme Weather Days in Sri Lanka Using Ensemble Learning
 
 **Student:** P. D. S. C. Dissanayake
-**University:** University of Moratuwa — B.Sc. (Hons) Information Technology
-**Assignment:** Ensemble Learning Hands-On Assignment (10 Marks)
+
 
 ---
 
@@ -79,15 +78,14 @@ An Extreme Weather Day is defined as:
 
 ## Results
 
-| Model | F1 Score | ROC-AUC | Note |
-|-------|----------|---------|------|
-| Majority Baseline | 0.0000 | 0.5000 | Always predicts "Normal" |
-| Random Forest | 0.7143 | 0.9809 | Bagging |
-| XGBoost ⭐ | 0.7756 | 0.9865 | **Best** |
-| LightGBM | 0.7615 | 0.9862 | |
-| Stacking | 0.7249 | 0.9840 | |
-| RF Only (Colombo) | 0.3293 | — | Hybrid baseline |
-| RF+ARIMA (Colombo) | 0.7984 | — | Hybrid result |
+| Model | F1 Score | ROC-AUC | Method |
+|-------|----------|---------|--------|
+| Random Forest | 0.7668 | 0.9813 | Bagging + GridSearchCV |
+| XGBoost | 0.8061 | 0.9862 | Boosting + GridSearchCV |
+| **LightGBM** ⭐ | **0.8068** | **0.9858** | Boosting + early stopping |
+| CatBoost | 0.8039 | 0.9848 | Boosting |
+| Stacking | 0.7847 | 0.9814 | RF+XGB+LGBM → Logistic |
+| RF+ARIMA hybrid | ~0.798 | — | Time-series hybridization |
 
 ---
 
